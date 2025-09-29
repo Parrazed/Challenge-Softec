@@ -8,7 +8,7 @@ const Paso2 = lazy(() => import("../components/Paso2"));
 export default function Cotizar() {
   const [step, setStep] = useState(1);
   const [datos, setDatos] = useState<any[]>([]);
-  const [datosPaso1, setDatosPaso1] = useState<any[]>([]);
+  const [_datosPaso1, setDatosPaso1] = useState<any[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("formData");
@@ -76,7 +76,7 @@ export default function Cotizar() {
               }}
             />
           )}
-          {/* {step === 2 && <Paso2 datosPaso1={datosPaso1} />} */}
+          {step === 2 && <Paso2  />}
         </Suspense>
       </div>
     </div>

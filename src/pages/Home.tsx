@@ -1,8 +1,7 @@
-import logoH from "../assets/logoH.png";
 import logoF from "../assets/logoF.png";
 import logoF2 from "../assets/logoF2.png";
 import familia from "../assets/familia.png";
-import { FaExclamationCircle, FaPhoneAlt } from "react-icons/fa";
+import { FaExclamationCircle } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useFormulario } from "../hooks/useFormulario";

@@ -27,7 +27,7 @@ interface Paso1Props {
   next: (seleccionados: UserData[]) => void;
 }
 
-export default function Paso1({ datos, next }: Paso1Props) {
+export default function Paso1({ datos /*, next */  }: Paso1Props) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0); // índice del plan visible
   const scrollRef = useRef<HTMLDivElement>(null);

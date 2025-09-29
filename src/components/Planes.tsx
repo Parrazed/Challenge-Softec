@@ -19,7 +19,6 @@ interface PlanesProps {
 }
 
 function Planes({
-  id,
   detelles,
   image,
   precioAntes,
