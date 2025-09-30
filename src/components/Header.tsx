@@ -3,7 +3,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 
 function Header() {
   return (
-    <header className="relative flex justify-between mx-6 md:mx-20 my-4 bg-transparent z-10">
+    <header className="relative flex justify-between mx-6 md:mx-20 py-4 bg-transparent z-10">
       <img src={logoH} className="h-9 w-auto" />
       <div className="flex gap-4 items-center">
         <span className="hidden sm:block font-semibold">

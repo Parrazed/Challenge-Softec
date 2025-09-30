@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, type JSX } from "react";
 import Card from "./Card";
 import Planes from "./Planes";
 import usuarios from "../assets/usuario.png";
@@ -9,194 +9,91 @@ import Clinica from "../assets/clinica.png";
 import { FaUserDoctor } from "react-icons/fa6";
 import { BsHospital } from "react-icons/bs";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
-
+import type { DatosResumen } from "./Paso2";
 interface UserData {
-  birthDay: string;
-  celular: string;
-  comunicaciones: boolean;
-  edad: number;
-  lastName: string;
   name: string;
+  lastName: string;
+  celular: string;
+  edad: number;
   numeroDocumento: string;
-  privacidad: boolean;
   tipoDocumento: string;
 }
 
-interface Paso1Props {
-  datos: UserData[];
-  next: (seleccionados: UserData[]) => void;
+interface UserPlan {
+  name: string;
+  price: number;
+  description: string[];
+  age: number;
 }
 
-export default function Paso1({ datos /*, next */  }: Paso1Props) {
+interface UIPlan {
+  id: number;
+  cardId: number;
+  titulo: string;
+  edad: number;
+  detalles: { titulo: string; icon: JSX.Element | null; texto: string }[];
+  precioAhora: number;
+  precioAntes?: number;
+  image: string;
+  recomendado: boolean;
+}
+
+interface Paso1Props {
+  datos: UserData;
+  plan: UserPlan[];
+  next: (seleccionados: DatosResumen) => void;
+}
+
+const extras: Record<string, { image: string; recomendado: boolean }> = {
+  "Plan en Casa": { image: Casa, recomendado: false },
+  "Plan en Casa y Clínica": { image: Clinica, recomendado: true },
+  "Plan en Casa + Bienestar": { image: Casa, recomendado: false },
+  "Plan en Casa + Chequeo": { image: Casa, recomendado: false },
+  "Plan en Casa + Fitness": { image: Casa, recomendado: false },
+};
+
+function mapToUIPlan(plan: UserPlan, id: number, cardId: number): UIPlan {
+  const extra = extras[plan.name] ?? { image: Casa };
+
+  return {
+    id,
+    cardId,
+    titulo: plan.name,
+    edad: plan.age,
+    detalles: plan.description.map((desc, idx) => ({
+      titulo: `Detalle ${idx + 1}`,
+      icon:
+        idx === 0 ? (
+          <FaUserDoctor />
+        ) : idx === 1 ? (
+          <BiLaptop />
+        ) : (
+          <BsHospital />
+        ),
+      texto: desc,
+    })),
+    precioAhora: plan.price,
+    precioAntes: cardId === 2 ? plan.price : undefined,
+    image: extra.image,
+    recomendado: extra.recomendado,
+  };
+}
+
+export default function Paso1({ datos, plan, next }: Paso1Props) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // índice del plan visible
+  const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const planes = [
-    {
-      id: 1,
-      cardId: 2,
-      titulo: "Plan en Casa",
-      detalles: [
-        {
-          titulo: "Médico general a domicilio",
-          icon: <FaUserDoctor />,
-          texto: "por S/20 y medicinas cubiertas al 100%.",
-        },
-        {
-          titulo: "Videoconsulta",
-          icon: <BiLaptop />,
-          texto:
-            "y orientación telefónica al 100% en medicina general + pediatría.",
-        },
-        {
-          titulo: "Indemnización",
-          icon: <BsHospital />,
-          texto: "de S/300 en caso de hospitalización por más de un día.",
-        },
-      ],
-      precioAhora: 37.05,
-      precioAntes: 39,
-      image: Casa,
-      recomendado: false,
-    },
-    {
-      id: 2,
-      cardId: 2,
-      titulo: "Plan en Casa y Clínica",
-      detalles: [
-        {
-          titulo: "Consulta en clínica",
-          icon: <FaUserDoctor />,
-          texto: "para cualquier especialidad.",
-        },
-        {
-          titulo: "Medicinas y exámenes",
-          icon: <BiLaptop />,
-          texto: "derivados cubiertos al 80%",
-        },
-        {
-          titulo: "más de 200 clínicas del país",
-          icon: <BsHospital />,
-          texto: "con atención médica completa",
-        },
-      ],
-      precioAhora: 94.05,
-      precioAntes: 99,
-      image: Clinica,
-      recomendado: true,
-    },
-    {
-      id: 3,
-      cardId: 2,
-      titulo: "Plan en Casa + Chequeo",
-      detalles: [
-        {
-          titulo: "Un Chequeo preventivo general",
-          icon: <FaUserDoctor />,
-          texto: "de manera presencial o virtual.",
-        },
-        {
-          titulo: "Acceso a Vacunas",
-          icon: <BiLaptop />,
-          texto: "en el Programa del MINSA en centros privados.",
-        },
-        {
-          titulo: "Incluye todos los beneficios del plan en casa.",
-          icon: <BsHospital />,
-          texto: "",
-        },
-      ],
-      precioAhora: 46.55,
-      precioAntes: 49,
-      image: Casa,
-      recomendado: false,
-    },
-    {
-      id: 4,
-      cardId: 1,
-      titulo: "Plan en Casa",
-      detalles: [
-        {
-          titulo: "Médico general a domicilio",
-          icon: <FaUserDoctor />,
-          texto: "por S/20 y medicinas cubiertas al 100%.",
-        },
-        {
-          titulo: "Videoconsulta",
-          icon: <BiLaptop />,
-          texto:
-            "y orientación telefónica al 100% en medicina general + pediatría.",
-        },
-        {
-          titulo: "Indemnización",
-          icon: <BsHospital />,
-          texto: "de S/300 en caso de hospitalización por más de un día.",
-        },
-      ],
-      precioAhora: 37.05,
-      image: Casa,
-      recomendado: false,
-    },
-    {
-      id: 5,
-      cardId: 1,
-      titulo: "Plan en Casa y Clínica",
-      detalles: [
-        {
-          titulo: "Consulta en clínica",
-          icon: <FaUserDoctor />,
-          texto: "para cualquier especialidad.",
-        },
-        {
-          titulo: "Medicinas y exámenes",
-          icon: <BiLaptop />,
-          texto: "derivados cubiertos al 80%",
-        },
-        {
-          titulo: "más de 200 clínicas del país",
-          icon: <BsHospital />,
-          texto: "con atención médica completa",
-        },
-      ],
-      precioAhora: 94.05,
-      image: Clinica,
-      recomendado: true,
-    },
-    {
-      id: 6,
-      cardId: 1,
-      titulo: "Plan en Casa + Chequeo",
-      detalles: [
-        {
-          titulo: "Un Chequeo preventivo general",
-          icon: <FaUserDoctor />,
-          texto: "de manera presencial o virtual.",
-        },
-        {
-          titulo: "Acceso a Vacunas",
-          icon: <BiLaptop />,
-          texto: "en el Programa del MINSA en centros privados.",
-        },
-        {
-          titulo: "Incluye todos los beneficios del plan en casa.",
-          icon: <BsHospital />,
-          texto: "",
-        },
-      ],
-      precioAhora: 46.55,
-      image: Casa,
-      recomendado: false,
-    },
-  ];
-  const planesPorCard: Record<number, typeof planes> = planes.reduce(
-    (acc, plan) => {
-      if (!acc[plan.cardId]) acc[plan.cardId] = [];
-      acc[plan.cardId].push(plan);
-      return acc;
-    },
-    {} as Record<number, typeof planes>
-  );
+  const uiPlanes = plan.flatMap((p, i) => [
+    mapToUIPlan(p, i + 1, 1),
+    mapToUIPlan(p, i + 1 + plan.length, 2),
+  ]);
+
+  const planesPorCard = uiPlanes.reduce((acc, p) => {
+    if (!acc[p.cardId]) acc[p.cardId] = [];
+    acc[p.cardId].push(p);
+    return acc;
+  }, {} as Record<number, UIPlan[]>);
 
   const planesVisibles = selectedId ? planesPorCard[selectedId] || [] : [];
 
@@ -213,17 +110,37 @@ export default function Paso1({ datos /*, next */  }: Paso1Props) {
   };
 
   const nextPlan = () => {
-    if (currentIndex < planes.length - 1) scrollToIndex(currentIndex + 1);
+    if (currentIndex < planesVisibles.length - 1)
+      scrollToIndex(currentIndex + 1);
   };
 
   const prevPlan = () => {
     if (currentIndex > 0) scrollToIndex(currentIndex - 1);
   };
 
+
+  const handleSelectPlan = (seleccionado: UIPlan) => {
+    if (!seleccionado) return;
+
+    const resumen = {
+      name: datos.name,
+      lastName: datos.lastName,
+      edad: datos.edad,
+      celular: datos.celular,
+      numeroDocumento: datos.numeroDocumento,
+      tipoDocumento: datos.tipoDocumento,
+      plan: seleccionado.titulo,
+      costo: seleccionado.precioAhora,
+    };
+
+    console.log("Resumen a usar en Paso 2:", resumen);
+    next(resumen);
+  };
+
   return (
-    <div className="w-full h-full px-6 pt-4 bg-gradient-to-b from-neutral-50 to-purple-100">
+    <div className="w-full h-full px-6 pt-4 ">
       <h2 className="text-3xl sm:text-xl sm:text-center font-bold mb-4">
-        {datos[0]?.name} ¿Para quién deseas <br /> cotizar?
+        {datos?.name} ¿Para quién deseas <br /> cotizar?
       </h2>
       <p className="text-lg mb-6 sm:text-base sm:text-center">
         Selecciona la opción que se ajuste más a tus necesidades.
@@ -254,40 +171,33 @@ export default function Paso1({ datos /*, next */  }: Paso1Props) {
             ref={scrollRef}
             className="flex sm:justify-center sm:gap-16 gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
           >
-            {planes
-              .filter((plan) => plan.cardId === selectedId)
-              .map((plan) => (
+            {planesVisibles
+              .filter((p: { edad: number; }) => p.edad >= (datos.edad ?? 0))
+              .map((p: UIPlan) => (
                 <div
-                  key={plan.id}
+                  key={p.id}
                   className="flex-shrink-0 w-[400px] sm:w-[250px]"
                 >
                   <Planes
-                    id={plan.id}
-                    titulo={plan.titulo}
-                    detelles={plan.detalles}
-                    precioAntes={plan.precioAntes ?? 0}
-                    precioAhora={plan.precioAhora}
-                    image={plan.image}
-                    recomendado={plan.recomendado}
+                    id={p.id}
+                    titulo={p.titulo}
+                    detelles={p.detalles}
+                    precioAntes={p.precioAntes ?? 0}
+                    precioAhora={p.precioAhora}
+                    image={p.image}
+                    edad={p.edad}
+                    recomendado={p.recomendado}
                     selectedCardId={selectedId}
+                    onSelect={() => handleSelectPlan(p)}
                   />
                 </div>
               ))}
           </div>
-
-          <div className="flex justify-center sm:hidden items-center gap-6 mt-4 mb-10">
+          <div className="flex justify-center sm:hidden items-center gap-6 mt-4 pb-10">
             <button
               onClick={prevPlan}
               disabled={currentIndex === 0}
-              className={`
-                w-10 h-10 flex justify-center items-center rounded-full 
-                ${
-                  currentIndex === 0
-                    ? "bg-purple-400 text-purple-50"
-                    : "bg-purple-500 text-purple-100"
-                }
-                transition-colors
-              `}
+              className="w-10 h-10 flex justify-center items-center rounded-full bg-purple-500 text-purple-100 disabled:opacity-50"
             >
               <FaChevronCircleLeft className="w-10 h-10" />
             </button>
@@ -299,15 +209,7 @@ export default function Paso1({ datos /*, next */  }: Paso1Props) {
             <button
               onClick={nextPlan}
               disabled={currentIndex === planesVisibles.length - 1}
-              className={`
-                w-10 h-10 flex justify-center items-center rounded-full border-2 text-purple-500
-                ${
-                  currentIndex === planes.length - 1
-                    ? "bg-purple-400 text-purple-50"
-                    : "bg-purple-500 text-purple-100"
-                }
-                transition-colors
-              `}
+              className="w-10 h-10 flex justify-center items-center rounded-full bg-purple-500 text-purple-100 disabled:opacity-50"
             >
               <FaChevronCircleRight className="w-10 h-10" />
             </button>

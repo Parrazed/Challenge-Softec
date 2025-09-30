@@ -3,12 +3,11 @@ import { FaCircle } from "react-icons/fa";
 
 interface Detalle {
   icon: ReactNode;
-  titulo: ReactNode;
   texto: ReactNode;
 }
 
 interface PlanesProps {
-  id: Number;
+  id: number;
   titulo: string;
   image: string;
   precioAntes: number;
@@ -16,22 +15,27 @@ interface PlanesProps {
   selectedCardId: number | null;
   recomendado: boolean;
   detelles: Detalle[];
+  edad:number;
+  onSelect: (id: number) => void;
 }
 
 function Planes({
+  id,
   detelles,
   image,
   precioAntes,
   precioAhora,
   titulo,
   recomendado,
+  edad,
+  onSelect
 }: PlanesProps) {
   return (
-    <div className="h-[800px] w-[400px] sm:h-[600px] sm:w-[280px] relative flex flex-col p-4 bg-white shadow-md rounded-3xl cursor-pointer transition-shadow my-10 items-center">
+    <div className="h-[800px] w-[380px] sm:h-[600px] sm:w-[280px] relative flex flex-col p-4 bg-white shadow-md rounded-3xl cursor-pointer transition-shadow my-10 items-center">
       <div className="flex mt-20">
         {recomendado && (
           <span className="absolute top-16 left-8 bg-[#7df0ba] text-black px-2 py-1 text-xs font-bold rounded-lg">
-            Plan recomendado
+            Plan recomendado 
           </span>
         )}
         <div className="w-2/3 px-5">
@@ -43,7 +47,7 @@ function Planes({
             </p>
           )}
 
-          <p className="text-2xl sm:text-lg font-bold"> ${precioAhora} ahora</p>
+          <p className="text-2xl sm:text-lg font-bold"> ${precioAhora} al mes</p>
         </div>
         <div className="w-1/3">
           <img
@@ -62,16 +66,20 @@ function Planes({
               <span className="sm:hidden">{detalle.icon}</span>
             </div>
             <div className="text-lg sm:text-sm">
-              <span className="font-bold">{detalle.titulo}</span>{" "}
               {detalle.texto}
             </div>
           </div>
         ))}
       </div>
+      <p className="hidden">{edad}</p>
 
-      <button className="absolute bottom-6 left-1/2 -translate-x-1/2 w-3/4  bg-[#f60732] rounded-full h-12 mt-20 mb-4 text-white m-auto ">
+      <button
+        onClick={() => onSelect(id)}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 w-3/4 bg-[#f60732] rounded-full h-12 mt-20 mb-4 text-white m-auto"
+      >
         <span className="text-lg">Seleccionar un Plan</span>
       </button>
+
     </div>
   );
 }

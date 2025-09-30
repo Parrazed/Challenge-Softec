@@ -49,8 +49,6 @@ export function useFormulario() {
     };
 
     setFormData(finalData);
-    console.log("JSON final enviado:", finalData);
-
     return finalData;
   };
 
